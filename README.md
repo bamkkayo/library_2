@@ -1,13 +1,13 @@
 # 도서 관리 시스템 (Library Management System)
 
-Next.js 14(App Router) 프론트엔드와 Spring Boot 3 백엔드를 연동한 풀스택 도서 관리 프로젝트입니다.  
+Next.js 15(App Router) 프론트엔드와 Spring Boot 3 백엔드를 연동한 풀스택 도서 관리 프로젝트입니다.  
 내장형 H2 데이터베이스(MySQL 모드)를 사용하여 별도의 외부 DB 설치 없이 즉시 구동 및 테스트가 가능합니다.
 
 ---
 
 ## 기술 스택 
 ### Frontend
-- **Framework:** Next.js 15 (App Router)
+- **Framework:** Next.js 15.5.18 (App Router)
 - **Styling:** Tailwind CSS
 - **State/Fetch:** React Hooks & Native Fetch API
 
