@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.0'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group = 'library'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 스프링 웹 MVC 및 내장 톰캣 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // DB 작업을 위한 기본 JDBC 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+
+    // MySQL 드라이버 (사용하시는 DB 드라이버로 대체 가능)
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // 🚨 수정 포인트: H2 DB를 런타임(runtimeOnly)뿐만 아니라 컴파일 시점(implementation)에도 인식하도록 변경
+    implementation 'com.h2database:h2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

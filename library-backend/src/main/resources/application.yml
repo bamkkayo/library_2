@@ -1,0 +1,13 @@
+spring:
+  h2:
+    console:
+      enabled: true  # http://localhost:8080/h2-console 접속 허용
+  datasource:
+    url: jdbc:h2:mem:library;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
