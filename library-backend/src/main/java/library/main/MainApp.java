@@ -3,23 +3,39 @@ package library.main;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
 import library.dto.BookDTO;
 import library.service.LibraryService;
 
-public class MainApp {
+@SpringBootApplication
+@ComponentScan(basePackages = "library") // 다른 패키지(service, dao 등)의 빈을 인식하도록 설정
+public class MainApp implements CommandLineRunner {
 
-    // 비즈니스 로직 담당
-    // Service 계층 객체
+    // 비즈니스 로직 담당 Service 계층 객체
+    // (우선 기존 구조를 유지하기 위해 new로 생성하지만, 나중에 스프링 빈 주입을 권장합니다)
     private static LibraryService service = new LibraryService();
 
     // 사용자 입력을 받기 위한 Scanner
     private static Scanner sc = new Scanner(System.in);
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
+        // 내장 톰캣 서버를 가동하고 스프링 부트를 실행하는 핵심 코드
+        SpringApplication.run(MainApp.class, args);
+    }
 
+    // 스프링 부트 서버가 완전히 켜진 후, 자동으로 실행되는 콘솔 메뉴 로직
+    @Override
+    public void run(String... args) throws Exception {
+        runConsoleMenu();
+    }
+
+    private void runConsoleMenu() throws SQLException {
         // 프로그램이 종료되기 전까지 계속 실행되는 무한 반복문
         while (true) {
-
             System.out.println("\n===== 도서 관리 시스템 =====");
             System.out.println("1. 도서 등록");
             System.out.println("2. 도서 목록 조회");
@@ -34,7 +50,6 @@ public class MainApp {
             // 버퍼 정리
             sc.nextLine();
 
-            // switch 화살표 문법 사용
             switch (menu) {
                 case 1 -> insertBook();
                 case 2 -> listBooks();
@@ -58,10 +73,7 @@ public class MainApp {
         System.out.print("글쓴이: ");
         String author = sc.nextLine();
 
-        // DTO 생성
         BookDTO book = new BookDTO(0, title, author, "Y");
-
-
         int result = service.addBook(book);
 
         if (result == 1) {
@@ -73,9 +85,7 @@ public class MainApp {
 
     // 도서 목록 조회
     private static void listBooks() throws SQLException {
-
-        service.getAllBooks()
-                .forEach(System.out::println);
+        service.getAllBooks().forEach(System.out::println);
     }
 
     // 도서 대여
@@ -87,7 +97,6 @@ public class MainApp {
         int memberId = sc.nextInt();
 
         int result = service.rentBook(bookId, memberId);
-
         System.out.println(result == 1 ? "대여 성공" : "대여 실패");
     }
 
@@ -96,9 +105,7 @@ public class MainApp {
         System.out.print("도서 번호: ");
         int bookId = sc.nextInt();
 
-        // Service에서 반납 처리, 상태 변경 수행
         int result = service.returnBook(bookId);
-
         System.out.println(result == 1 ? "반납 성공" : "반납 실패");
     }
 
@@ -106,7 +113,6 @@ public class MainApp {
     private static void findBook() {
         System.out.print("조회할 도서 번호: ");
         int bookId = sc.nextInt();
-
 
         BookDTO book = service.getBookById(bookId);
 

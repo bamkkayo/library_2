@@ -1,39 +1,74 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.0'
-    id 'io.spring.dependency-management' version '1.1.5'
+    // apply false를 붙여 부모 프로젝트가 스프링 부트로 오작동하는 것을 완벽히 막습니다.
+    id 'org.springframework.boot' version '3.3.0' apply false
+    id 'io.spring.dependency-management' version '1.1.5' apply false
 }
 
-group = 'library'
-version = '0.0.1-SNAPSHOT'
+// 모든 모듈(최상위, 백엔드, 프론트엔드 전체)에 공통 적용되는 기본 설정
+allprojects {
+    group = 'library'
+    version = '0.0.1-SNAPSHOT'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    repositories {
+        mavenCentral()
     }
 }
 
-repositories {
-    mavenCentral()
-}
+// 실제 자바 코드가 돌아가는 서브 프로젝트(하위 모듈)들에만 설정을 주입
+subprojects {
+    // 오직 백엔드 프로젝트(library-backend)에만 스프링 부트 및 자바 설정을 적용합니다.
+    if (name == 'library-backend') {
+        apply plugin: 'java'
+        apply plugin: 'org.springframework.boot'
+        apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-    // 스프링 웹 MVC 및 내장 톰캣 라이브러리
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(21)
+            }
+        }
 
-    // DB 작업을 위한 기본 JDBC 라이브러리
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+        dependencies {
+            // 스프링 웹 MVC 및 내장 톰캣 라이브러리
+            implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // MySQL 드라이버 (사용하시는 DB 드라이버로 대체 가능)
-    runtimeOnly 'com.mysql:mysql-connector-j'
+            // JPA 및 H2 데이터베이스 의존성
+            implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+            implementation 'com.h2database:h2'
 
-    // 🚨 수정 포인트: H2 DB를 런타임(runtimeOnly)뿐만 아니라 컴파일 시점(implementation)에도 인식하도록 변경
-    implementation 'com.h2database:h2'
+            // 기존 JDBC 및 MySQL 라이브러리 유지
+            implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+            runtimeOnly 'com.mysql:mysql-connector-j'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
+            // 테스트 관련 라이브러리
+            testImplementation 'org.springframework.boot:spring-boot-starter-test'
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        }
 
-tasks.named('test') {
-    useJUnitPlatform()
+        tasks.named('test') {
+            useJUnitPlatform()
+        }
+
+        // Gradle이 하위 백엔드 내부의 실제 소스 경로를 찾도록 강제 지정
+        sourceSets {
+            main {
+                java {
+                    srcDirs = ['src/main/java']
+                }
+                resources {
+                    srcDirs = ['src/main/resources']
+                }
+            }
+        }
+
+        // 백엔드 모듈에 메인 클래스 경로를 확실하게 명시
+        springBoot {
+            mainClass = 'library.main.MainApp'
+        }
+
+        bootJar {
+            mainClass = 'library.main.MainApp'
+        }
+    }
 }
