@@ -13,13 +13,14 @@ import library.util.DBUtil;
 public class BookDAO {
 
     public int insert(BookDTO book) throws SQLException {
-        String sql = "INSERT INTO BOOKS(title, author, status) VALUES (?, ?, 'Y')";
+        String sql = "INSERT INTO BOOKS(book_id, title, author, status) VALUES (?, ?, ?, 'Y')";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, book.getTitle());
-            pstmt.setString(2, book.getAuthor());
+            pstmt.setInt(1, book.getBookId());
+            pstmt.setString(2, book.getTitle());
+            pstmt.setString(3, book.getAuthor());
 
             return pstmt.executeUpdate();
         }

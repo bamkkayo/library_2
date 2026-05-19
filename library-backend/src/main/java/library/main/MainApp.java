@@ -12,29 +12,22 @@ import library.dto.BookDTO;
 import library.service.LibraryService;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "library") // 다른 패키지(service, dao 등)의 빈을 인식하도록 설정
+@ComponentScan(basePackages = "library")
 public class MainApp implements CommandLineRunner {
 
-    // 비즈니스 로직 담당 Service 계층 객체
-    // (우선 기존 구조를 유지하기 위해 new로 생성하지만, 나중에 스프링 빈 주입을 권장합니다)
     private static LibraryService service = new LibraryService();
-
-    // 사용자 입력을 받기 위한 Scanner
     private static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // 내장 톰캣 서버를 가동하고 스프링 부트를 실행하는 핵심 코드
         SpringApplication.run(MainApp.class, args);
     }
 
-    // 스프링 부트 서버가 완전히 켜진 후, 자동으로 실행되는 콘솔 메뉴 로직
     @Override
     public void run(String... args) throws Exception {
         runConsoleMenu();
     }
 
     private void runConsoleMenu() throws SQLException {
-        // 프로그램이 종료되기 전까지 계속 실행되는 무한 반복문
         while (true) {
             System.out.println("\n===== 도서 관리 시스템 =====");
             System.out.println("1. 도서 등록");
@@ -47,7 +40,6 @@ public class MainApp implements CommandLineRunner {
             System.out.print("선택: ");
 
             int menu = sc.nextInt();
-            // 버퍼 정리
             sc.nextLine();
 
             switch (menu) {
@@ -65,15 +57,18 @@ public class MainApp implements CommandLineRunner {
         }
     }
 
-    // 도서 등록
     private static void insertBook() {
+        System.out.print("도서 번호: ");
+        int bookId = sc.nextInt();
+        sc.nextLine();
+
         System.out.print("제목: ");
         String title = sc.nextLine();
 
         System.out.print("글쓴이: ");
         String author = sc.nextLine();
 
-        BookDTO book = new BookDTO(0, title, author, "Y");
+        BookDTO book = new BookDTO(bookId, title, author, "Y");
         int result = service.addBook(book);
 
         if (result == 1) {
@@ -83,36 +78,35 @@ public class MainApp implements CommandLineRunner {
         }
     }
 
-    // 도서 목록 조회
     private static void listBooks() throws SQLException {
         service.getAllBooks().forEach(System.out::println);
     }
 
-    // 도서 대여
     private static void rentBook() {
         System.out.print("도서 번호: ");
         int bookId = sc.nextInt();
 
         System.out.print("회원 번호: ");
         int memberId = sc.nextInt();
+        sc.nextLine();
 
         int result = service.rentBook(bookId, memberId);
         System.out.println(result == 1 ? "대여 성공" : "대여 실패");
     }
 
-    // 도서 반납
     private static void returnBook() {
         System.out.print("도서 번호: ");
         int bookId = sc.nextInt();
+        sc.nextLine();
 
         int result = service.returnBook(bookId);
         System.out.println(result == 1 ? "반납 성공" : "반납 실패");
     }
 
-    // 도서 단건 조회
     private static void findBook() {
         System.out.print("조회할 도서 번호: ");
         int bookId = sc.nextInt();
+        sc.nextLine();
 
         BookDTO book = service.getBookById(bookId);
 
